@@ -1,4 +1,5 @@
 import random
+import os
 
 def empty_maze(width,height):
     """
@@ -180,13 +181,18 @@ def maze_generator(width,height):
 
 
 class Enemy:
-    def __init__(self,maze,enemy_coordinates:list):
+
+    enemy_actual_coordinates=[]
+
+    def __init__(self,maze,no):
+        
         """
         constructor of the enemy class:
         creates the object the with its variables
         it puts the enemy obj to a random position
         it puts the actual coordinates to the enemy_coordinates list
         """
+        self.no=no
         self.position=None
         self.visited=[] #already visited nodes
         self.path=[]    #stack!
@@ -194,9 +200,9 @@ class Enemy:
         while True:
             y=random.randint(0,height-1)
             x=random.randint(0,width-1)
-            if (maze[y][x]=='p') and ([y,x] not in enemy_coordinates):
+            if (maze[y][x]=='p') and ([y,x] not in self.enemy_actual_coordinates):
                 self.position=[y,x]
-                enemy_coordinates.append(self.position)
+                self.enemy_actual_coordinates.append(self.position)
                 break
 
     def step(self,maze):
@@ -206,31 +212,30 @@ class Enemy:
             nextpos=next_node(self.position,direction,1)
             self.visited.append(nextpos)
             self.position=nextpos
+            self.enemy_actual_coordinates[self.no]=self.position
             self.path.append(self.position)
         else:
             self.position=self.path.pop()
+            self.enemy_actual_coordinates[self.no]=self.position
 
 
-def create_enemies(enemies:list,maze,enemy_coordinates):
-    for enemy in enemies:
-        enemy=Enemy(maze,enemy_coordinates) 
-
-
+def create_enemy(maze,num_of_enemy:int,enemies:list)->None:
+    for i in range(num_of_enemy):
+        enemy=Enemy(maze,i)
+        enemies.append(enemy)
 
 
 #----------------------TEST-------------------------
 width=int(input("width?: "))
 height=int(input("height?: "))
 num_of_enemy=int(input("enemy?: "))
-
 maze,gates=maze_generator(width,height)
 
-enemies=[None for enemy in range(num_of_enemy)]
-enemy_coordinates=[]
-#create_enemies(enemies,maze,enemy_coordinates)
-enemy1=Enemy(maze,enemy_coordinates)
+enemies=[]
+create_enemy(maze,num_of_enemy,enemies)
 while True:
-    print_maze(maze,enemy_coordinates)
     for i in range(len(enemies)):
-        enemy1.step(maze)
-    delay=input("next step")
+        enemies[i].step(maze)
+    os.system("clear")
+    print_maze(maze,Enemy.enemy_actual_coordinates)
+    delay=input("enter!")
