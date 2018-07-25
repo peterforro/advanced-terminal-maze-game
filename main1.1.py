@@ -41,22 +41,22 @@ def maze_initialization(maze):
     for y in range(height):
         for x in range(width):
             if y%2==0 and x%2==0:
-                maze[y][x]=1
+                maze[y][x]='1'
     return maze
 
 
-def available_directions(maze,node,):
+def available_directions(maze,node,gap,char):
     width,height=maze_dimensions(maze)
     y_pos=node[0]
     x_pos=node[1]
     directions=[]
-    if (y_pos-2>=0) and (maze[y_pos-2][x_pos]==1):
+    if (y_pos-gap>=0) and (maze[y_pos-2][x_pos]==char):
         directions.append(1)
-    if (x_pos+2<=width-1) and (maze[y_pos][x_pos+2]==1):
+    if (x_pos+gap<=width-1) and (maze[y_pos][x_pos+2]==char):
         directions.append(2)
-    if (y_pos+2<=height-1) and (maze[y_pos+2][x_pos]==1):
+    if (y_pos+gap<=height-1) and (maze[y_pos+2][x_pos]==char):
         directions.append(3)
-    if (x_pos-2>=0) and (maze[y_pos][x_pos-2]==1):
+    if (x_pos-gap>=0) and (maze[y_pos][x_pos-2]==char):
         directions.append(4)
     return directions
 
@@ -72,17 +72,17 @@ def set_node_to_visited(maze,node):
     return maze
 
 
-def next_node(node,direction):
+def next_node(node,direction,gap):
     y_pos=node[0]
     x_pos=node[1]
     if direction==1:
-        return [y_pos-2,x_pos]
+        return [y_pos-gap,x_pos]
     elif direction==2:
-        return [y_pos,x_pos+2]
+        return [y_pos,x_pos+gap]
     elif direction==3:
-        return [y_pos+2,x_pos]
+        return [y_pos+gap,x_pos]
     elif direction==4:
-        return [y_pos,x_pos-2]
+        return [y_pos,x_pos-gap]
 
 
 def delete_wall(maze,node,next_node):
@@ -154,10 +154,10 @@ def maze_generator(width,height):
     maze=set_node_to_visited(maze,node)
     nodes.append(node)
     while len(nodes)!=0:
-        directions=available_directions(maze,node)
+        directions=available_directions(maze,node,2,'1')
         if directions:
             direction=random_direction(directions)
-            nextnode=next_node(node,direction)
+            nextnode=next_node(node,direction,2)
             maze=set_node_to_visited(maze,nextnode)
             maze=delete_wall(maze,node,nextnode)
             node=nextnode
@@ -172,7 +172,15 @@ def maze_generator(width,height):
 
 class Enemy:
     def __init__(self,maze,enemy_coordinates:list):
+        """
+        constructor of the enemy class:
+        creates the object the with its variables
+        it puts the enemy obj to a random position
+        it puts the actual coordinates to the enemy_coordinates list
+        """
         self.position=None
+        self.visited=[] #already visited nodes
+        self.path=[]    #stack!
         width,height=maze_dimensions(maze)
         while True:
             y=random.randint(0,height-1)
@@ -182,11 +190,18 @@ class Enemy:
                 enemy_coordinates.append(self.position)
                 break
 
+    def step(self,maze):
+        directions=available_directions(maze,self.position,1,'p')
+        direction=random_direction(directions)
+
 
 
 def create_enemies(enemies:list,maze,enemy_coordinates):
     for enemy in enemies:
         enemy=Enemy(maze,enemy_coordinates) 
+
+
+
 
 #----------------------TEST-------------------------
 width=int(input("width?: "))
@@ -199,4 +214,3 @@ enemies=[None for enemy in range(num_of_enemy)]
 enemy_coordinates=[]
 create_enemies(enemies,maze,enemy_coordinates)
 print_maze(maze,enemy_coordinates)
-print(enemy_coordinates)
