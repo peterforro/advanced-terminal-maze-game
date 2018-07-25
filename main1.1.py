@@ -45,19 +45,28 @@ def maze_initialization(maze):
     return maze
 
 
-def available_directions(maze,node,gap,char):
+def available_directions(maze,node,gap,char,visited_coordinates):
     width,height=maze_dimensions(maze)
     y_pos=node[0]
     x_pos=node[1]
     directions=[]
-    if (y_pos-gap>=0) and (maze[y_pos-2][x_pos]==char):
-        directions.append(1)
-    if (x_pos+gap<=width-1) and (maze[y_pos][x_pos+2]==char):
-        directions.append(2)
-    if (y_pos+gap<=height-1) and (maze[y_pos+2][x_pos]==char):
-        directions.append(3)
-    if (x_pos-gap>=0) and (maze[y_pos][x_pos-2]==char):
-        directions.append(4)
+
+    if ((y_pos-gap>=0) and (maze[y_pos-gap][x_pos]==char) 
+        and [y_pos-gap,x_pos] not in visited_coordinates):
+            directions.append(1)
+    
+    if ((x_pos+gap<=width-1) and (maze[y_pos][x_pos+gap]==char)
+        and [y_pos,x_pos+gap] not in visited_coordinates):
+            directions.append(2)
+    
+    if ((y_pos+gap<=height-1) and (maze[y_pos+gap][x_pos]==char)
+        and [y_pos+gap,x_pos] not in visited_coordinates):
+            directions.append(3)
+
+    if ((x_pos-gap>=0) and (maze[y_pos][x_pos-gap]==char)
+        and [y_pos,x_pos-gap] not in visited_coordinates):
+            directions.append(4)
+
     return directions
 
 
@@ -154,7 +163,7 @@ def maze_generator(width,height):
     maze=set_node_to_visited(maze,node)
     nodes.append(node)
     while len(nodes)!=0:
-        directions=available_directions(maze,node,2,'1')
+        directions=available_directions(maze,node,2,'1',[])
         if directions:
             direction=random_direction(directions)
             nextnode=next_node(node,direction,2)
@@ -191,9 +200,15 @@ class Enemy:
                 break
 
     def step(self,maze):
-        directions=available_directions(maze,self.position,1,'p')
-        direction=random_direction(directions)
-
+        directions=available_directions(maze,self.position,1,'p',self.visited)
+        if directions!=[]: 
+            direction=random_direction(directions)
+            nextpos=next_node(self.position,direction,1)
+            self.visited.append(nextpos)
+            self.position=nextpos
+            self.path.append(self.position)
+        else:
+            self.position=self.path.pop()
 
 
 def create_enemies(enemies:list,maze,enemy_coordinates):
@@ -212,5 +227,10 @@ maze,gates=maze_generator(width,height)
 
 enemies=[None for enemy in range(num_of_enemy)]
 enemy_coordinates=[]
-create_enemies(enemies,maze,enemy_coordinates)
-print_maze(maze,enemy_coordinates)
+#create_enemies(enemies,maze,enemy_coordinates)
+enemy1=Enemy(maze,enemy_coordinates)
+while True:
+    print_maze(maze,enemy_coordinates)
+    for i in range(len(enemies)):
+        enemy1.step(maze)
+    delay=input("next step")
