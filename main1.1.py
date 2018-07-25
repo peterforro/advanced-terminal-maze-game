@@ -204,6 +204,7 @@ class Enemy:
             if (maze[y][x]=='p') and ([y,x] not in self.enemy_actual_coordinates):
                 self.position=[y,x]
                 self.enemy_actual_coordinates.append(self.position)
+                self.path.append(self.position)
                 break
 
     def step(self,maze,finish_pos):
@@ -221,8 +222,12 @@ class Enemy:
                 self.enemy_actual_coordinates[self.no]=self.position
                 self.path.append(self.position)
             else:
-                self.position=self.path.pop()
-                self.enemy_actual_coordinates[self.no]=self.position
+                try:
+                    self.position=self.path.pop()
+                    self.enemy_actual_coordinates[self.no]=self.position
+                except Exception:
+                    self.enemy_actual_coordinates[self.no]=[10000,1000]
+                    pass
             
         
 def create_enemy(maze,num_of_enemy:int,enemies:list)->None:
