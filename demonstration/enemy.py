@@ -1,3 +1,11 @@
+#################################################################################
+##                                                                             ##
+##                           JUST FOR DEMONSTRATION                            ##
+##                            NOT THE ACTUAL CODE!                             ##
+##                                                                             ##
+#################################################################################
+
+
 import random
 import os
 
@@ -254,10 +262,6 @@ def create_enemy(maze,num_of_enemy:int,enemies:list)->None:
 
 
 
-
-
-
-
 #----------------------TEST-------------------------
 width=int(input("width?: "))
 height=int(input("height?: "))
@@ -267,7 +271,7 @@ maze,start_pos,finish_pos=maze_generator(width,height)
 enemies=[]
 create_enemy(maze,num_of_enemy,enemies)
 
-while True:
+while Enemy.num_of_enemies > 0:
     for enemy in enemies:
         enemy.step(maze,finish_pos)
     os.system("clear")
