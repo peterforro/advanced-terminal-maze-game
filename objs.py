@@ -114,6 +114,4 @@ class Enemy:
                 self.step_forward(maze,directions) 
             else:
                 self.step_back()
-
-
   

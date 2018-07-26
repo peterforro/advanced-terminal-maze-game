@@ -54,6 +54,7 @@ def enemy_game():
                 sprite_pos[0]==height-1 or
                     button_press=='x'):
                         os.system("clear")
+                        del(objs.Enemy.actual_node[:])
                         break
         sprite_pos=sprite_control(button_press,maze,sprite_pos)
         for enemy in enemies:
@@ -88,6 +89,7 @@ def fog_game():
             objs.Treasure.num_of_treasures==0 or 
                 button_press=='x'):
                     os.system("clear")
+                    del(objs.Treasure.position_of_treasures[:])
                     break
         if button_press=='t':
             tracking=False if tracking else True
