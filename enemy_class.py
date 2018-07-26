@@ -2,10 +2,15 @@ import generator
 import random
 
 
-def create_enemies(maze,num_of_enemy:int,enemies:list)->None:
-    for i in range(num_of_enemy):
-        enemy=Enemy(maze,i)
-        enemies.append(enemy)
+def create_objects(maze,num_of_objects:int,object_list:list, type_of_obj:str)->None:
+    if type_of_obj == "enemy":
+        for i in range(num_of_objects):
+            obj=Enemy(maze,i)
+            object_list.append(obj)
+    elif type_of_obj == "treasure":
+        for i in range(num_of_objects):
+            obj=Treasure(maze,i)
+            object_list.append(obj)
 
 
 class Enemy:
@@ -76,3 +81,34 @@ class Enemy:
                 self.step_forward(maze,directions) 
             else:
                 self.step_back()
+
+
+class Treasure:
+
+    position_of_treasures=[]
+    num_of_treasures=0
+
+    def __init__(self,maze,no):
+    """
+    constructor of the enemy class:
+    creates the object the with its instance variables
+    calls the the random_position_generator() method
+    """
+    Treasure.num_of_treasures+=1
+    self.no=no
+    self.position=None
+    self.random_position_generator(maze)
+
+    def random_position_generator(self,maze):
+        width,height=generator.maze_dimensions(maze)
+        while True:
+            y=random.randint(0,height-1)
+            x=random.randint(0,width-1)
+            if (maze[y][x]=='p') and ([y,x] not in self.position_of_treasures):
+                self.position=[y,x]
+                self.position_of_treasures.append(self.position)
+                break
+
+    def kill(self):
+        position_of_treasures[no] = [10000,10000]
+        Treasure.num_of_treasures-=1

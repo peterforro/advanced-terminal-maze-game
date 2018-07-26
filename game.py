@@ -89,6 +89,6 @@ def fog_game():
         prnt.print_fog_maze(maze,player,tracking)
 
 
-enemy_game()
-os.system("clear")
+#enemy_game()
+#os.system("clear")
 fog_game()
