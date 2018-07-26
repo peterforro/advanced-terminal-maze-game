@@ -21,7 +21,26 @@ def maze_dimensions(maze,dim=""):
         return width,height
 
 
-def print_maze(maze:list, enemies:list)->None:
+
+def maze_magnifier(maze):
+    width,height=maze_dimensions(maze)
+    magnified=[]
+
+    for y in range(height):
+        tmp=[]
+        for x in range(width):
+            for i in range(3):
+                tmp.append(maze[x][y])
+
+        for i in range(2):
+            magnified.append(tmp)
+
+    return magnified
+
+
+
+
+def print_maze(maze:list, enemies=[])->None:
 
     width,height=maze_dimensions(maze)
     block = '\u2588'
@@ -51,10 +70,9 @@ def maze_initialization(maze):
         for x in range(width):
             if y%2==0 and x%2==0:
                 maze[y][x]='1'
-    return maze
 
 
-def available_directions(maze,node,gap,char,visited_coordinates):
+def available_directions(maze,node,gap,char,visited_coordinates=[]):
     width,height=maze_dimensions(maze)
     y_pos=node[0]
     x_pos=node[1]
@@ -87,7 +105,6 @@ def set_node_to_visited(maze,node):
     y_pos=node[0]
     x_pos=node[1]
     maze[y_pos][x_pos]='p'
-    return maze
 
 
 def next_node(node,direction,gap):
@@ -106,170 +123,90 @@ def next_node(node,direction,gap):
 def delete_wall(maze,node,next_node):
     wall_y=int((node[0]+next_node[0])/2)
     wall_x=int((node[1]+next_node[1])/2)
-    maze=set_node_to_visited(maze,[wall_y,wall_x])
-    return maze
+    set_node_to_visited(maze,[wall_y,wall_x])
 
 
 def add_upper_boarder(maze):
     width=maze_dimensions(maze,'w')
     upper_boarder=['w' for x in range(width)]
     maze.insert(0,upper_boarder)
-    return maze
 
 
 def add_lower_boarder(maze):
     width=maze_dimensions(maze,'w')
     lower_boarder=['w' for x in range(width)]
     maze.append(lower_boarder)
-    return maze
 
 
 def add_left_boarder(maze):
     height=maze_dimensions(maze,'h')
     for y in range(height):
         maze[y].insert(0,'w')
-    return maze
 
 
 def add_right_boarder(maze):
     height=maze_dimensions(maze,'h')
     for y in range(height):
         maze[y].append('w')
-    return maze
 
 
 def add_boarders(maze):
-    maze=add_upper_boarder(maze)
-    maze=add_left_boarder(maze)
+    add_upper_boarder(maze)
+    add_left_boarder(maze)
     width,height=maze_dimensions(maze)
     if width%2==0:
-        maze=add_right_boarder(maze)
+        add_right_boarder(maze)
     if height%2==0:
-        maze=add_lower_boarder(maze)
-    return maze
+        add_lower_boarder(maze)
 
 
-def open_gates(maze,start):
-    start_y=start[0]
-    start_x=start[1]+1
-    maze[start_y][start_x]='p'
-    width,height=maze_dimensions(maze)
-    finish_x=None
-    for x in range(-1,-width-1,-1):
-        if maze[height-2][x]=='p':
-            finish_x=x
+def start_gate(maze):
+    width=maze_dimensions(maze,'w')
+    for x in range(width):
+        if maze[2][x]=='p':
+            maze[1][x]='p'
+            maze[0][x]='p'
             break
-    finish_y=height-1
-    maze[finish_y][finish_x]='p'
-    finish_x+=width
-    return maze,[start_y,start_x],[finish_y,finish_x]
+    return [0,x]
+
+def finish_gate(maze):
+    width,height=maze_dimensions(maze)
+    for x in range(-1,-width-1,-1):
+        if maze[height-3][x]=='p':
+            maze[height-2][x]='p'
+            maze[height-1][x]='p'
+            break
+
+
+def open_gates(maze,boarder_width=0):
+    start_node=start_gate(maze)
+    finish_gate(maze)
+    return start_node
+
 
 
 def maze_generator(width,height):
     nodes=[]
     maze=empty_maze(width,height)
-    maze=maze_initialization(maze)
-    node=start=[0,0]
-    maze=set_node_to_visited(maze,node)
+    maze_initialization(maze)
+    node=[0,0]
+    set_node_to_visited(maze,node)
     nodes.append(node)
     while len(nodes)!=0:
-        directions=available_directions(maze,node,2,'1',[])
+        directions=available_directions(maze,node,2,'1')
         if directions:
             direction=random_direction(directions)
             nextnode=next_node(node,direction,2)
-            maze=set_node_to_visited(maze,nextnode)
-            maze=delete_wall(maze,node,nextnode)
+            set_node_to_visited(maze,nextnode)
+            delete_wall(maze,node,nextnode)
             node=nextnode
             nodes.append(node)
         else:
             node=nodes.pop()
-    maze=add_boarders(maze)
-    maze,start_pos,finish_pos=open_gates(maze,start)
-    return maze,start_pos,finish_pos
+    add_boarders(maze)
+    maze=maze_magnifier(maze)
+    start_node=open_gates(maze)
+    return maze,start_node
 
 
 
-class Enemy:
-    
-    num_of_enemies=0
-    enemy_actual_coordinates=[]
-
-    def __init__(self,maze,no):
-        """
-        constructor of the enemy class:
-        creates the object the with its variables
-        it puts the enemy obj to a random position
-        it puts the actual coordinates to the enemy_coordinates list
-        """
-        self.no=no
-        self.position=None
-        self.visited=[] #already visited nodes
-        self.path=[]    #stack!
-        self.alive=True
-
-        width,height=maze_dimensions(maze)
-        Enemy.num_of_enemies+=1
-
-        while True:
-            y=random.randint(0,height-1)
-            x=random.randint(0,width-1)
-            if (maze[y][x]=='p') and ([y,x] not in self.enemy_actual_coordinates):
-                self.position=[y,x]
-                self.enemy_actual_coordinates.append(self.position)
-                self.path.append(self.position)
-                break
-
-    def step(self,maze,finish_pos):
-        if self.position==finish_pos:
-            self.alive=False
-            self.position=[10000,10000]
-            Enemy.num_of_enemies-=1
-            self.enemy_actual_coordinates[self.no]=self.position
-        if self.alive:
-            directions=available_directions(maze,self.position,1,'p',self.visited)
-            if directions!=[]: 
-                direction=random_direction(directions)
-                nextpos=next_node(self.position,direction,1)
-                self.visited.append(nextpos)
-                self.position=nextpos
-                self.enemy_actual_coordinates[self.no]=self.position
-                self.path.append(self.position)
-            else:
-                try:
-                    self.position=self.path.pop()
-                    self.enemy_actual_coordinates[self.no]=self.position
-                except Exception:
-                    self.enemy_actual_coordinates[self.no]=[10000,1000]
-                    Enemy.num_of_enemies-=1
-                    pass
-            
-        
-def create_enemy(maze,num_of_enemy:int,enemies:list)->None:
-    for i in range(num_of_enemy):
-        enemy=Enemy(maze,i)
-        enemies.append(enemy)
-
-
-
-
-
-
-
-
-
-
-#----------------------TEST-------------------------
-width=int(input("width?: "))
-height=int(input("height?: "))
-num_of_enemy=int(input("enemy?: "))
-maze,start_pos,finish_pos=maze_generator(width,height)
-
-enemies=[]
-create_enemy(maze,num_of_enemy,enemies)
-
-while True:
-    for enemy in enemies:
-        enemy.step(maze,finish_pos)
-    os.system("clear")
-    print_maze(maze,Enemy.enemy_actual_coordinates)
-    delay=input("enter!")
