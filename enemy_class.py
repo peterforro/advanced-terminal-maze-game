@@ -110,5 +110,5 @@ class Treasure:
                 break
 
     def kill(self):
-        position_of_treasures[no] = [10000,10000]
+        self.position_of_treasures[self.no] = [10000,10000]
         Treasure.num_of_treasures-=1
