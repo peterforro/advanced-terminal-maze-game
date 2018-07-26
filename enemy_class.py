@@ -89,15 +89,15 @@ class Treasure:
     num_of_treasures=0
 
     def __init__(self,maze,no):
-    """
-    constructor of the enemy class:
-    creates the object the with its instance variables
-    calls the the random_position_generator() method
-    """
-    Treasure.num_of_treasures+=1
-    self.no=no
-    self.position=None
-    self.random_position_generator(maze)
+        """
+        constructor of the enemy class:
+        creates the object the with its instance variables
+        calls the the random_position_generator() method
+        """
+        Treasure.num_of_treasures+=1
+        self.no=no
+        self.position=None
+        self.random_position_generator(maze)
 
     def random_position_generator(self,maze):
         width,height=generator.maze_dimensions(maze)
