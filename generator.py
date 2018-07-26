@@ -39,7 +39,7 @@ def maze_magnifier(maze):
         tmp=[]
         for x in range(width):
             for i in range(3):
-                tmp.append(maze[x][y])
+                tmp.append(maze[y][x])
 
         for i in range(2):
             magnified.append(tmp)

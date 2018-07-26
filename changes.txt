@@ -41,3 +41,12 @@ maze demo                   amik szemleltetik a backtracking algoritmusok mukode
 
 
 TOBB FILE-RA/MODULRA VALO SZETROBBANTAS!!!!!!
+-----------------------------------
+demo bugfix
+treasure object
+classic
+kilépő
+menü
+docstring 
+refactoralas (mutable)
+file_nevek atirasa

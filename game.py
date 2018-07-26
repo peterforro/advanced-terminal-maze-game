@@ -57,6 +57,8 @@ def enemy_game():
         for enemy in enemies:
             enemy.step(maze)
         
+        if button_press=='x':
+            break
         os.system("clear")
         prnt.print_enemy_maze(maze,player,enemy_class.Enemy.actual_node)
 
@@ -85,10 +87,12 @@ def fog_game():
         generator.fog_reveal(maze,player,2)
         if button_press=='t':
             tracking=False if tracking else True
+        if button_press=='x':
+            break
         os.system("clear")
         prnt.print_fog_maze(maze,player,tracking)
 
 
-enemy_game()
-os.system("clear")
+#enemy_game()
+#os.system("clear")
 fog_game()
