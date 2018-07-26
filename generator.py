@@ -10,6 +10,15 @@ def empty_maze(width,height):
 
 
 
+def raw_print(maze):
+    width,height=maze_dimensions(maze)
+    for y in range(height):
+        for x in range(width):
+            print(maze[y][x],end="")
+        print("")
+
+
+
 def maze_dimensions(maze,dim=""):
     width=len(maze[0])
     height=len(maze)
@@ -38,30 +47,26 @@ def maze_magnifier(maze):
     return magnified
 
 
+def fog_reveal(maze,player,distance):
+    y,x=player[0],player[1]
+    for dist in range(distance):
+        delta_y=[y+dist,y+dist,y,y-dist,y-dist,y-dist,y,y+dist]
+        delta_x=[x,x+dist,x+dist,x+dist,x,x-dist,x-dist,x-dist]
+        for i in range(8):
+            if (delta_y[i]<0) or (delta_x[i]<0):
+                continue
+            try:
+                maze[delta_y[i]][delta_x[i]]=maze[delta_y[i]][delta_x[i]].upper()
+            except Exception:
+                pass
 
 
-def print_maze(maze:list, enemies=[])->None:
 
-    width,height=maze_dimensions(maze)
-    block = '\u2588'
+def initial_visibility(maze,distance):
+    for y in range(distance):
+        for x in range(distance):
+            maze[y][x]=maze[y][x].upper()
 
-    for y in range(height):
-        for x in range(width):
-
-            is_enemy=False
-            if enemies!=[]:
-                for i in range(len(enemies)):
-                    if [y,x]==enemies[i]:
-                            is_enemy=True
-                            print("E",end="")
-                            break
-
-            if (maze[y][x]=='p') and (not is_enemy):
-                print(" ",end="")
-            elif maze[y][x]=='w':
-                print("\033[33m" + block + "\033[37m", end="")
-
-        print("")
 
 
 def maze_initialization(maze):
@@ -169,6 +174,7 @@ def start_gate(maze):
             break
     return [0,x]
 
+
 def finish_gate(maze):
     width,height=maze_dimensions(maze)
     for x in range(-1,-width-1,-1):
@@ -185,7 +191,7 @@ def open_gates(maze,boarder_width=0):
 
 
 
-def maze_generator(width,height):
+def maze_generator(width,height,enemy_game=False):
     nodes=[]
     maze=empty_maze(width,height)
     maze_initialization(maze)
@@ -204,9 +210,7 @@ def maze_generator(width,height):
         else:
             node=nodes.pop()
     add_boarders(maze)
-    maze=maze_magnifier(maze)
+    if enemy_game:
+        maze=maze_magnifier(maze)
     start_node=open_gates(maze)
     return maze,start_node
-
-
-
