@@ -5,9 +5,10 @@ import objs
 import prnt
 
 
-def wall_check(maze, i, j):
+def wall_check(maze, y, x):
+
     try:
-        if maze[i][j] in ['w','W']:
+        if maze[y][x] in ['w','W']:
             return False
         else:
             return True
@@ -15,7 +16,9 @@ def wall_check(maze, i, j):
         pass
 
 
+
 def sprite_control(button_press,maze,node):
+
     y,x=node[0],node[1]
     maze[y][x] = "V"
     if button_press == "s":
@@ -35,6 +38,7 @@ def sprite_control(button_press,maze,node):
 
 
 def enemy_game():
+
     width=int(input("width?: "))
     height=int(input("height?: "))
     num_of_enemy=int(input("enemy?: "))
@@ -66,6 +70,7 @@ def enemy_game():
 
 
 def fog_game():
+    
     width=int(input("width?: "))
     height=int(input("height?: "))
     num_of_treasure=int(input("number of treasures?: "))

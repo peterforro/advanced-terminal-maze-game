@@ -52,11 +52,6 @@ class Enemy:
     actual_node=[]
 
     def __init__(self,maze,no):
-        """
-        constructor of the enemy class:
-        creates the object the with its instance variables
-        calls the the random_position_generator() method
-        """
         Enemy.num_of_enemies+=1
         self.no=no
         self.position=None
