@@ -103,9 +103,3 @@ def fog_game():
         os.system("clear")
         print(f"Treasures left: {objs.Treasure.num_of_treasures}\n")
         prnt.print_fog_maze(maze,sprite_pos,tracking,treasures)
-
-
-
-enemy_game()
-#os.system("clear")
-#fog_game()
