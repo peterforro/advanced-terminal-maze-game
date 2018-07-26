@@ -1,14 +1,18 @@
 import os
 import getch_
-import generator
-import enemy_class
+import gnrtr
+import objs
 import prnt
 
+
 def wall_check(maze, i, j):
-    if maze[i][j] in ['w','W']:
-        return False
-    else:
-        return True
+    try:
+        if maze[i][j] in ['w','W']:
+            return False
+        else:
+            return True
+    except Exception:
+        pass
 
 
 def sprite_control(button_press,maze,node):
@@ -38,29 +42,24 @@ def enemy_game():
     os.system("clear")
     getch = getch_._Getch()
 
-    maze,player=generator.maze_generator(width,height,True)
+    maze,sprite_pos=gnrtr.maze_generator(width,height,True)
     enemies=[]
-    enemy_class.create_enemies(maze,num_of_enemy,enemies)
-    prnt.print_enemy_maze(maze,player,enemy_class.Enemy.actual_node)
-    height=generator.maze_dimensions(maze,'h')
+    objs.create_objects(maze,num_of_enemy,enemies,'enemy')
+    prnt.print_enemy_maze(maze,sprite_pos,objs.Enemy.actual_node)
+    height=gnrtr.maze_dimensions(maze,'h')
 
     while True:
-        if player in enemy_class.Enemy.actual_node:
-            print("Enemy!")
-            break
-        if player[0]==height-1:
-            print("Winner!")
-            break
         button_press = getch()
-        player=sprite_control(button_press,maze,player)
-        
+        if (sprite_pos in objs.Enemy.actual_node or 
+                sprite_pos[0]==height-1 or
+                    button_press=='x'):
+                        os.system("clear")
+                        break
+        sprite_pos=sprite_control(button_press,maze,sprite_pos)
         for enemy in enemies:
             enemy.step(maze)
-        
-        if button_press=='x':
-            break
         os.system("clear")
-        prnt.print_enemy_maze(maze,player,enemy_class.Enemy.actual_node)
+        prnt.print_enemy_maze(maze,sprite_pos,objs.Enemy.actual_node)
 
 
 
@@ -68,31 +67,45 @@ def enemy_game():
 def fog_game():
     width=int(input("width?: "))
     height=int(input("height?: "))
-    os.system("clear")
-    getch = getch_._Getch()
+    num_of_treasure=int(input("number of treasures?: "))
     tracking=False
 
-    maze,player=generator.maze_generator(width,height)
+    os.system("clear")
+    getch = getch_._Getch()
 
-    generator.initial_visibility(maze,10)
-    prnt.print_fog_maze(maze,player,tracking)
-    height=generator.maze_dimensions(maze,'h')
+    maze,sprite_pos=gnrtr.maze_generator(width,height)
+    treasures=[]
+    objs.create_objects(maze,num_of_treasure,treasures,'treasure')
+
+    gnrtr.initial_visibility(maze,5)
+    print(f"Treasures left: {objs.Treasure.num_of_treasures}\n")
+    prnt.print_fog_maze(maze,sprite_pos,tracking,treasures)
+    height=gnrtr.maze_dimensions(maze,'h')
 
     while True:
-        if player[0]==height-1:
-            print("Winner!")
-            break
         button_press = getch()
-        player=sprite_control(button_press,maze,player)
-        generator.fog_reveal(maze,player,2)
+        if (sprite_pos[0]==height-1 and 
+            objs.Treasure.num_of_treasures==0 or 
+                button_press=='x'):
+                    os.system("clear")
+                    break
         if button_press=='t':
             tracking=False if tracking else True
-        if button_press=='x':
-            break
+
+        sprite_pos=sprite_control(button_press,maze,sprite_pos)
+        gnrtr.fog_reveal(maze,sprite_pos,2)
+
+        for treasure in treasures:
+            treasure.set_visibility(maze)
+            if sprite_pos==treasure.position:
+                treasure.kill()
+       
         os.system("clear")
-        prnt.print_fog_maze(maze,player,tracking)
+        print(f"Treasures left: {objs.Treasure.num_of_treasures}\n")
+        prnt.print_fog_maze(maze,sprite_pos,tracking,treasures)
 
 
-#enemy_game()
+
+enemy_game()
 #os.system("clear")
-fog_game()
+#fog_game()
