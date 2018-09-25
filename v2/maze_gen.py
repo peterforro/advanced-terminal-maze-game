@@ -1,4 +1,5 @@
 import random
+import os
 
 
 def custom_size_empty_matrix(width,height):
@@ -7,7 +8,7 @@ def custom_size_empty_matrix(width,height):
     Args: width and height of the matrix
     Return: Custom matrix (list of lists) filled with 0s.
     """
-    return [[ " " for x in range(width)] for y in range(height)]
+    return [[" " for x in range(width)] for y in range(height)]
 
 
 
@@ -118,7 +119,41 @@ def make_a_path(matrix,position,next_position):
     wall_x = (x_pos + x_next)//2
     set_node_to_visited(matrix,(wall_y,wall_x))
 
+
     
+def random_maze_generator(width,height):
+    """
+    Do: generates the custom size random maze,
+    based on the DFS (depth-first-search) maths algorithm
+    by executing the small steps of the procedure
+    Arg: the width and the height of the desired maze
+    Return: random maze (matrix)
+    """
+    os.system("cls")
+    matrix = custom_size_empty_matrix(width,height)
+    initialize_matrix(matrix,width,height)
+    position = 0,0
+    node_stack = [position]
+    os.system("cls")
+    print_matrix(matrix,height)
+    input("-ENTER-")
+    os.system("cls")
+    while node_stack != []:
+        set_node_to_visited(matrix,position)
+        directions = available_directions(matrix,width,height,position)
+        if directions:
+            direction = choose_random_direction(directions)
+            next_position = define_next_position(position,direction)
+            make_a_path(matrix,position,next_position)
+            position = next_position
+            node_stack.append(position)
+        else:
+            position = node_stack.pop()
+        print_matrix(matrix,height)
+        input("-ENTER-")
+        os.system("cls")
+    return matrix
+
 
 
 
@@ -126,20 +161,10 @@ def make_a_path(matrix,position,next_position):
 #---------------------------------------TESTING-----------------------------------------
 #---------------------------------------------------------------------------------------
 def main():
+    width = int(input("width?: "))
+    height = int(input("height?: "))
+    random_maze_generator(width,height)
     
-    width,height = 5,5
-    position = 2,2
-    matrix = custom_size_empty_matrix(width,height)
-    
-    initialize_matrix(matrix,width,height)
-    print(available_directions(matrix,width,height,position))
-    
-    set_node_to_visited(matrix,position)
-    directions = available_directions(matrix,width,height,position)
-    next_position = define_next_position(position,choose_random_direction(directions))
-    make_a_path(matrix,position,next_position)
-    set_node_to_visited(matrix,next_position)
-    print_matrix(matrix,height)
 
 
 if __name__ == '__main__':
